@@ -43,6 +43,13 @@ export interface IUpdateRepositoryMissingAction {
   readonly missing: boolean
 }
 
+/** Change a repository's display name. */
+export interface IUpdateRepositoryDisplayNameAction {
+  readonly name: 'update-repository-displayname'
+  readonly repository: IRepository
+  readonly displayName: string
+}
+
 /** Change a repository's path. */
 export interface IUpdateRepositoryPathAction {
   readonly name: 'update-repository-path'
@@ -53,4 +60,4 @@ export interface IUpdateRepositoryPathAction {
 export type Action = IGetAccountsAction | IGetRepositoriesAction |
                      IAddRepositoriesAction | IUpdateGitHubRepositoryAction |
                      IRemoveRepositoriesAction | IAddAccountAction | IRemoveAccountAction |
-                     IUpdateRepositoryMissingAction | IUpdateRepositoryPathAction
+                     IUpdateRepositoryMissingAction | IUpdateRepositoryDisplayNameAction | IUpdateRepositoryPathAction

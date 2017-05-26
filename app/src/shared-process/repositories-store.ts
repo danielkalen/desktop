@@ -104,6 +104,20 @@ export class RepositoriesStore {
     return updatedRepository
   }
 
+  /** Update the repository's display name. */
+  public async updateRepositoryDisplayName(repository: Repository, displayName: string): Promise<Repository> {
+    const repoID = repository.id
+    if (!repoID) {
+      return fatalError('`updateRepositoryMissing` can only update `displayName` for a repository which has been added to the database.')
+    }
+
+    const updatedRepository = repository.withDisplayName(displayName)
+    const gitHubRepositoryID = updatedRepository.gitHubRepository ? updatedRepository.gitHubRepository.dbID : null
+    await this.db.repositories.put({ ...updatedRepository, gitHubRepositoryID, gitHubRepository: undefined })
+
+    return updatedRepository
+  }
+
   /** Update the repository's path. */
   public async updateRepositoryPath(repository: Repository, path: string): Promise<Repository> {
     const repoID = repository.id

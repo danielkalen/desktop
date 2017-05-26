@@ -628,6 +628,14 @@ export class GitStore {
     this.emitUpdate()
   }
 
+  /** Changes the URL for the remote that matches the given name  */
+  public async setDisplayName(name: string): Promise<void> {
+    // await this.performFailableOperation(() => setDisplayName(this.repository, name))
+    // await this.loadCurrentRemote()
+
+    // this.emitUpdate()
+  }
+
   /**
    * Read the contents of the repository .gitignore.
    *

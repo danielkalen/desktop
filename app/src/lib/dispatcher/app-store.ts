@@ -1657,6 +1657,12 @@ export class AppStore {
   }
 
   /** This shouldn't be called directly. See `Dispatcher`. */
+  public _setDisplayName(repository: Repository, name: string): Promise<void> {
+    const gitStore = this.getGitStore(repository)
+    return gitStore.setDisplayName(name)
+  }
+
+  /** This shouldn't be called directly. See `Dispatcher`. */
   public _openShell(path: string) {
     this.statsStore.recordOpenShell()
 

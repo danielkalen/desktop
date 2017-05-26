@@ -19,6 +19,7 @@ export class Repository implements IRepository {
   /** The working directory of this repository */
   public readonly path: string
   public readonly gitHubRepository: GitHubRepository | null
+  public readonly displayName: string
 
   /** Was the repository missing on disk last we checked? */
   public readonly missing: boolean
@@ -33,11 +34,12 @@ export class Repository implements IRepository {
     }
   }
 
-  public constructor(path: string, id: number, gitHubRepository: GitHubRepository | null, missing: boolean) {
+  public constructor(path: string, id: number, gitHubRepository: GitHubRepository | null, missing: boolean, displayName?: string | null) {
     this.path = path
     this.gitHubRepository = gitHubRepository
     this.id = id
     this.missing = missing
+    this.displayName = displayName || this.name
   }
 
   /**
@@ -50,12 +52,17 @@ export class Repository implements IRepository {
 
   /** Create a new repository with a changed `missing` flag. */
   public withMissing(missing: boolean): Repository {
-    return new Repository(this.path, this.id, this.gitHubRepository, missing)
+    return new Repository(this.path, this.id, this.gitHubRepository, missing, this.displayName)
+  }
+
+  /** Create a new repository with a changed display name. */
+  public withDisplayName(displayName: string): Repository {
+    return new Repository(this.path, this.id, this.gitHubRepository, this.missing, this.displayName)
   }
 
   /** Create a new repository with a changed path. */
   public withPath(path: string): Repository {
-    return new Repository(path, this.id, this.gitHubRepository, this.missing)
+    return new Repository(path, this.id, this.gitHubRepository, this.missing, this.displayName)
   }
 
   public get name(): string {

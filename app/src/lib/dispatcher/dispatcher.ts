@@ -131,6 +131,7 @@ export class Dispatcher {
   /** Get the repositories the user has added to the app. */
   private async loadRepositories(): Promise<ReadonlyArray<Repository>> {
     const json = await this.dispatchToSharedProcess<ReadonlyArray<IRepository>>({ name: 'get-repositories' })
+    console.log(json)
     return json.map(Repository.fromJSON)
   }
 
@@ -624,6 +625,14 @@ export class Dispatcher {
     } else {
       this.appStore._showPopup({ type: PopupType.InstallGit, path })
     }
+  }
+
+  /** Changes the repository's local display name */
+  public async setDisplayName(repository: Repository, displayName: string): Promise<void> {
+    this.dispatchToSharedProcess<IRepository>({ name: 'update-repository-displayname', repository, displayName })
+  // public async setDisplayName(repository: Repository, displayName: string): Promise<Repository> {
+  //   const repo = await this.dispatchToSharedProcess<IRepository>({ name: 'update-repository-displayname', repository, displayName })
+  //   return Repository.fromJSON(repo)
   }
 
   /**

@@ -12,6 +12,7 @@ import {
   IAddAccountAction,
   IRemoveAccountAction,
   IUpdateRepositoryMissingAction,
+  IUpdateRepositoryDisplayNameAction,
   IUpdateRepositoryPathAction,
 } from '../lib/dispatcher'
 import { API } from '../lib/api'
@@ -100,6 +101,15 @@ register('get-repositories', () => {
 register('update-github-repository', async ({ repository }: IUpdateGitHubRepositoryAction) => {
   const inflatedRepository = Repository.fromJSON(repository as IRepository)
   const updatedRepository = await repositoriesStore.updateGitHubRepository(inflatedRepository)
+
+  broadcastUpdate()
+
+  return updatedRepository
+})
+
+register('update-repository-displayname', async ({ repository, displayName }: IUpdateRepositoryDisplayNameAction) => {
+  const inflatedRepository = Repository.fromJSON(repository)
+  const updatedRepository = await repositoriesStore.updateRepositoryDisplayName(inflatedRepository, displayName)
 
   broadcastUpdate()
 

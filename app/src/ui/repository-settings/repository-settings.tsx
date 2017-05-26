@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { TabBar } from '../tab-bar'
 import { Remote } from './remote'
+import { DisplayName } from './display-name'
 import { GitIgnore } from './git-ignore'
 import { assertNever } from '../../lib/fatal-error'
 import { IRemote } from '../../models/remote'
@@ -22,12 +23,14 @@ interface IRepositorySettingsProps {
 
 enum RepositorySettingsTab {
   Remote = 0,
+  DisplayName,
   IgnoredFiles,
 }
 
 interface IRepositorySettingsState {
   readonly selectedTab: RepositorySettingsTab
   readonly remote: IRemote | null
+  readonly displayName: string | null
   readonly ignoreText: string | null
   readonly ignoreTextHasChanged: boolean
   readonly disabled: boolean
@@ -41,6 +44,7 @@ export class RepositorySettings extends React.Component<IRepositorySettingsProps
     this.state = {
       selectedTab: RepositorySettingsTab.Remote,
       remote: props.remote,
+      displayName: props.repository.displayName,
       ignoreText: null,
       ignoreTextHasChanged: false,
       disabled: false,
@@ -83,6 +87,7 @@ export class RepositorySettings extends React.Component<IRepositorySettingsProps
 
         <TabBar onTabClicked={this.onTabClicked} selectedIndex={this.state.selectedTab}>
           <span>Remote</span>
+          <span>Name</span>
           <span>{ __DARWIN__ ? 'Ignored Files' : 'Ignored files'}</span>
         </TabBar>
 
@@ -125,6 +130,14 @@ export class RepositorySettings extends React.Component<IRepositorySettingsProps
           return <NoRemote onPublish={this.onPublish}/>
         }
       }
+      case RepositorySettingsTab.DisplayName: {
+        return (
+          <DisplayName
+            text={this.state.displayName}
+            onDisplayNameChanged={this.onDisplayNameChanged}
+          />
+        )
+      }
       case RepositorySettingsTab.IgnoredFiles: {
         return <GitIgnore
           text={this.state.ignoreText}
@@ -165,6 +178,15 @@ export class RepositorySettings extends React.Component<IRepositorySettingsProps
       }
     }
 
+    if (this.state.displayName && this.props.repository) {
+      try {
+        await this.props.dispatcher.setDisplayName(this.props.repository, this.state.displayName)
+      } catch (e) {
+        logError(`RepositorySettings: unable to save gitignore at ${this.props.repository.path}`, e)
+        errors.push(`Failed saving the .gitignore file: ${e}`)
+      }
+    }
+
     if (this.state.ignoreTextHasChanged && this.state.ignoreText !== null) {
       try {
         await this.props.dispatcher.saveGitIgnore(this.props.repository, this.state.ignoreText || '')
@@ -191,6 +213,10 @@ export class RepositorySettings extends React.Component<IRepositorySettingsProps
 
     const newRemote = { ...remote, url }
     this.setState({ remote: newRemote })
+  }
+
+  private onDisplayNameChanged = (displayName: string) => {
+    this.setState({ displayName: displayName })
   }
 
   private onIgnoreTextChanged = (text: string) => {
